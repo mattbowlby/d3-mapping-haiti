@@ -1,0 +1,138 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>A D3 map with basic interaction</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="ht_communes.js"></script>
+    
+    <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+
+<style>
+    body {
+        padding: 0;
+        margin: 0;
+        background: whitesmoke;
+    }
+    h1, h2 {
+        position: absolute;
+        left: 20px;
+        top: 10px;
+        font-family: "Proxima Nova", Montserrat, sans-serif;
+        font-size: 2em;
+        font-weight: 100;
+        color: #005DAA; /* offical UK Kentucky blue */
+    }
+    h2 {
+        top: 50px;
+        font-size: 1.6em;
+    }
+    .country {
+      stroke:   #344152; /* blue corn */
+      fill:     #5B92E5; /* United Nations blue */
+    }
+    
+    .commune {
+      stroke: #fff;
+      fill: #005DAA;
+    }
+
+    .hover {
+      fill: #5B92E5;   
+    }
+
+    .d3-tip {
+      line-height: 1;
+      font-weight: bold;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      border-radius: 2px;
+    }
+
+    /* Creates a small triangle extender for the tooltip */
+    .d3-tip:after {
+      box-sizing: border-box;
+      display: inline;
+      font-size: 10px;
+      width: 100%;
+      line-height: 1;
+      color: rgba(0, 0, 0, 0.8);
+      content: "\25BC";
+      position: absolute;
+      text-align: center;
+    }
+
+    /* Style northward tooltips differently */
+    .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+    }
+
+</style>
+</head>
+
+<body>
+    <h1>Haiti Communes (with tooltip)</h1>
+    <h2></h2>
+  <script>
+        
+    var width = window.innerWidth,
+        height = window.innerHeight;
+    
+    var svg = d3.select( "body" )
+          .append( "svg" )
+          .attr( "width", width )
+          .attr( "height", height );
+      
+    // create a first guess for the projection
+    var center = d3.geo.centroid(ht_communes);
+  
+    var scale = 15000;
+    var offset = [width / 2, height / 2];
+
+    var projection = d3.geo.mercator()
+        .center(center)
+        .scale(scale)
+        .translate(offset);
+
+    var geoPath = d3.geo.path()
+        .projection(projection);
+    
+    var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset(function() {
+            return [this.getBBox().height / 4.5, 0]
+        })
+        .html(function(d) {
+            return "<strong>Department:</strong> <span style='color:white'>" + d.properties.department + "</span>" + "<br>" + 
+    "<strong>Commune:</strong> <span style='color:white'>" + d.properties.commune + "</span>";
+  });
+    
+    svg.call(tip);
+    
+
+
+    svg.append("g")
+        .selectAll("path")
+        .data(ht_communes.features)
+        .enter()
+        .append("path")
+        .attr( "d", geoPath )
+        .attr("class", "commune")
+        .on("mouseover", function(d){
+            d3.select("h2").text(d.properties.commune + " / " + d.properties.department);
+            d3.select(this).attr("class","commune hover");
+        })
+        .on("mouseout", function(d){
+            d3.select("h2").text("");
+            d3.select(this).attr("class","commune");
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
+
+
+  </script>
+</body>
+</html>

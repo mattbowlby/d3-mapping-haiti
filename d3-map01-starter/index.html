@@ -1,0 +1,81 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>A D3 map with basic interaction</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="ht_departments.js"></script>
+    
+    <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+
+<style>
+    body {
+        padding: 0;
+        margin: 0;
+        background: whitesmoke;
+    }
+    h1, h2 {
+        position: absolute;
+        left: 20px;
+        top: 10px;
+        font-family: "Proxima Nova", Montserrat, sans-serif;
+        font-size: 2em;
+        font-weight: 100;
+        color: #005DAA; /* offical UK Kentucky blue */
+    }
+    h2 {
+        top: 50px;
+        font-size: 1.6em;
+    }
+    .country {
+      stroke:   #344152; /* blue corn */
+      fill:     #5B92E5; /* United Nations blue */
+    }
+    
+    .department {
+      stroke: #fff;
+      fill: #005DAA; /* dark blue */
+    }
+
+    .hover {
+        fill: #5B92E5; /* United Nations blue */   
+    }
+</style>
+</head>
+<body>
+    <h1>Haiti - Departments</h1>
+    <h2></h2>
+  <script>
+        
+    var width = window.innerWidth,
+        height = window.innerHeight;
+    
+    var svg = d3.select( "body" )
+          .append( "svg" )
+          .attr( "width", width )
+          .attr( "height", height );
+      
+    // create a first guess for the projection
+    var center = d3.geo.centroid(ht_departments);
+  
+    var scale = 15000;
+    var offset = [width / 2, height / 2];
+
+    var projection = d3.geo.mercator()
+        .center(center)
+        .scale(scale)
+        .translate(offset);
+
+    var geoPath = d3.geo.path()
+        .projection(projection);
+        
+    svg.append("g")
+        .selectAll("path")
+        .data(ht_departments.features)
+        .enter()
+        .append("path")
+        .attr( "d", geoPath )
+        .attr("class","department");
+ 
+  </script>
+</body>
+</html>
